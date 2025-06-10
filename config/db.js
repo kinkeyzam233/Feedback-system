@@ -6,7 +6,10 @@ const db = pgp({
   port: process.env.DB_PORT || 5432,
   database: process.env.DB_NAME || 'feedback-system',
   user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'kinleyzam'
+  password: process.env.DB_PASSWORD || 'kinleyzam',
+  ssl:{
+    rejectUnauthorized:false,
+  }
 });
 
 module.exports = {
