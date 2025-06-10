@@ -1,0 +1,46 @@
+{
+  "name": "feedback-system",
+  "version": "1.0.0",
+  "description": "A college feedback system using Node.js, Express, PostgreSQL, and EJS.",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kinkeyzam233/Feedback-system.git"
+  },
+  "keywords": [
+    "feedback",
+    "express",
+    "nodejs",
+    "postgresql",
+    "ejs",
+    "college"
+  ],
+  "author": "kinley zam",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kinkeyzam233/Feedback-system/issues"
+  },
+  "homepage": "https://github.com/kinkeyzam233/Feedback-system#readme",
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.5",
+    "bcrypt": "^6.0.0",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.5.0",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "jsonwebtoken": "^9.0.2",
+    "method-override": "^3.0.0",
+    "nodemailer": "^7.0.3",
+    "pg": "^8.11.3",
+    "pg-promise": "^11.13.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

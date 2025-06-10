@@ -1,0 +1,5 @@
+node_modules/
+ .env
+ .DS_Store
+
+ "dev": "NODE_NO_WARNINGS=1 nodemon app.js"
