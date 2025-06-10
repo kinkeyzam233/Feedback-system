@@ -4,7 +4,7 @@ require('dotenv').config();
 
 // Render login page
 const getLogin = (req, res) => {
-  res.render('auth/login', {
+  res.render('pages/login', {
     message: req.flash('error')[0] || null,
   });
 };
@@ -76,7 +76,7 @@ const postLogin = async (req, res) => {
 
 // Render register page
 const getRegister = (req, res) => {
-  res.render('auth/register');
+  res.render('pages/register');
 };
 
 // Handle registration POST (students only)
@@ -98,7 +98,7 @@ const postRegister = async (req, res) => {
 
 // Render reset password page
 const getResetPassword = (req, res) => {
-  res.render('auth/reset-password');
+  res.render('pages/reset-password');
 };
 
 // Handle password reset (placeholder)
