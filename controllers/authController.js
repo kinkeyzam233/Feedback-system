@@ -8,9 +8,6 @@ const getLogin = (req, res) => {
     message: req.flash('error')[0] || null,
   });
 };
-console.log('ADMIN_EMAIL from env:', process.env.ADMIN_EMAIL);
-console.log('ADMIN_PASSWORD from env:', process.env.ADMIN_PASSWORD);
-
 // Handle login POST (admin & students)
 const postLogin = async (req, res) => {
   try {
