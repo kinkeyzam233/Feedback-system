@@ -2,7 +2,7 @@ const {
   addFeedback, 
   getFeedbackByStudentId, 
   deleteFeedback 
-} = require('../models/feedbackModel');
+} = require('../Models/feedbackModel');
 const db = require('../config/db');
 
 // Hardcoded options for feedback form
