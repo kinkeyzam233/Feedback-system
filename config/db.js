@@ -1,27 +1,29 @@
- // db.js
+// db.js
 
 const pgp = require('pg-promise')();
 require('dotenv').config();
 
-// Determine if the app is running in a production environment
-const isProduction = process.env.NODE_ENV === 'production';
+// Ensure all required environment variables are set
+const { DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD } = process.env;
 
-// Database connection config
+if (!DB_HOST || !DB_PORT || !DB_NAME || !DB_USER || !DB_PASSWORD) {
+  throw new Error('❌ Missing one or more required database environment variables.');
+}
+
+// Database connection config (always use SSL on Render)
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME || 'feedback-system',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || '',
-  ssl: isProduction
-    ? { rejectUnauthorized: false }  // Use SSL in production (e.g., Render)
-    : false                          // No SSL for local dev
+  host: DB_HOST,
+  port: Number(DB_PORT),
+  database: DB_NAME,
+  user: DB_USER,
+  password: DB_PASSWORD,
+  ssl: { rejectUnauthorized: false }
 };
 
 // Initialize the connection
 const db = pgp(dbConfig);
 
-// Optional: Log connection success
+// Optional: Log connection success/failure
 db.connect()
   .then(obj => {
     console.log('✅ Database connected successfully');
