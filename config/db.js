@@ -13,4 +13,3 @@ const db = pgp({
 // });
 
 module.exports = db; // ✅ Export directly, not { db }
-

@@ -7,8 +7,6 @@ const getLogin = (req, res) => {
     message: req.flash('error')[0] || null,
   });
 };
-
-// Handle login POST
 const postLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -63,10 +61,7 @@ const postLogin = async (req, res) => {
 
 // Render register page
 const getRegister = (req, res) => {
-  res.render('pages/register', {
-    formData: {},
-    errors: []
-  });
+  res.render('pages/register', { formData: req.body || {} });
 };
 
 // Handle registration POST
