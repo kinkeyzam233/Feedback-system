@@ -1,29 +1,46 @@
-// db.js
+// src/config/db.js
 
 const pgp = require('pg-promise')();
-require('dotenv').config();
+require('dotenv').config(); // Only useful for local dev
 
-// Ensure all required environment variables are set
-const { DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD } = process.env;
+// Extract required DB environment variables
+const {
+  DB_HOST,
+  DB_PORT,
+  DB_NAME,
+  DB_USER,
+  DB_PASSWORD
+} = process.env;
 
+// Check that all necessary env variables are present
 if (!DB_HOST || !DB_PORT || !DB_NAME || !DB_USER || !DB_PASSWORD) {
-  throw new Error('❌ Missing one or more required database environment variables.');
+  console.error('❌ Missing one or more required database environment variables:');
+  console.error({
+    DB_HOST,
+    DB_PORT,
+    DB_NAME,
+    DB_USER,
+    DB_PASSWORD
+  });
+  throw new Error('❌ Cannot connect to database. One or more environment variables are missing.');
 }
 
-// Database connection config (always use SSL on Render)
+// Database config for Render (uses SSL)
 const dbConfig = {
   host: DB_HOST,
   port: Number(DB_PORT),
   database: DB_NAME,
   user: DB_USER,
   password: DB_PASSWORD,
-  ssl: { rejectUnauthorized: false }
+  ssl: {
+    rejectUnauthorized: false // required for Render
+  }
 };
 
-// Initialize the connection
+// Initialize and connect
 const db = pgp(dbConfig);
 
-// Optional: Log connection success/failure
+// Test the connection
 db.connect()
   .then(obj => {
     console.log('✅ Database connected successfully');
