@@ -76,7 +76,7 @@ const postLogin = async (req, res) => {
 
 // Render register page
 const getRegister = (req, res) => {
-  res.render('pages/register', { formData: req.body || {} }
+  res.render('pages/register', { formData: req.body || {} };
 };
 
 // Handle registration POST (students only)
