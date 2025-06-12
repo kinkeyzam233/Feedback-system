@@ -19,9 +19,32 @@ function isAdmin(req, res, next) {
     res.redirect('/login');
   }
 }
+// middleware/auth.js
+function isAuthenticated(req, res, next) {
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/edit_feedback');
+}
+
+function ensureAuthenticated(req, res, next) {
+  console.log('Session:', req.session);
+  console.log('User:', req.user);
+
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    console.log('User is authenticated');
+    return next();
+  }
+
+  console.log('User is NOT authenticated');
+  res.redirect('/login');
+}
+
+
 
 module.exports = {
   requireAuth,
   isStudent,
-  isAdmin
+  isAdmin,
+  ensureAuthenticated 
 };

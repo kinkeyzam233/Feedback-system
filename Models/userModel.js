@@ -1,7 +1,7 @@
-const { db } = require('../config/db'); // ✅ DESTRUCTURE db
+const { db } = require('../config/db');
 
 const User = {
-  // Find user by email (case-insensitive)
+  // Find user by email
   async findUserByEmail(email) {
     return db.oneOrNone(
       'SELECT * FROM users WHERE LOWER(email) = LOWER($1)',
@@ -27,7 +27,7 @@ const User = {
     );
   },
 
-  // Update user password by ID
+  // Update user password
   async updatePassword(id, hashedPassword) {
     return db.none(
       'UPDATE users SET password = $1 WHERE id = $2',

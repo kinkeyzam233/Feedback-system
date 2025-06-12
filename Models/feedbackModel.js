@@ -1,4 +1,4 @@
-const { db } = require('../config/db'); // ✅ Destructure `db` from the object
+const { db } = require('../config/db'); // Destructure `db` from your config
 
 // Get all feedback (with optional filters)
 const getFeedback = async (filter = {}) => {
@@ -8,6 +8,11 @@ const getFeedback = async (filter = {}) => {
   if (filter.course_id) {
     values.push(filter.course_id);
     query += ` AND course_id = $${values.length}`;
+  }
+
+  if (filter.module_id) {
+    values.push(filter.module_id);
+    query += ` AND module_id = $${values.length}`;
   }
 
   if (filter.semester) {
@@ -26,11 +31,12 @@ const getFeedback = async (filter = {}) => {
   }
 
   if (!filter.isAdmin) {
-    // Only show limited info if not admin
+    // For non-admins, show limited info, with anonymized student names if requested
     query = `
       SELECT 
         id,
         course_id,
+        module_id,
         rating,
         CASE 
           WHEN is_anonymous THEN 'Anonymous Student'
@@ -41,12 +47,20 @@ const getFeedback = async (filter = {}) => {
       FROM feedback
       WHERE 1=1
     `;
+    const limitedValues = [];
     if (filter.course_id) {
-      query += ` AND course_id = $1`;
+      limitedValues.push(filter.course_id);
+      query += ` AND course_id = $${limitedValues.length}`;
+    }
+    if (filter.module_id) {
+      limitedValues.push(filter.module_id);
+      query += ` AND module_id = $${limitedValues.length}`;
     }
     if (filter.student_id) {
-      query += ` AND student_id = $2`;
+      limitedValues.push(filter.student_id);
+      query += ` AND student_id = $${limitedValues.length}`;
     }
+    return db.any(query, limitedValues);
   }
 
   return db.any(query, values);
@@ -55,24 +69,44 @@ const getFeedback = async (filter = {}) => {
 // Add new feedback
 const addFeedback = async (data) => {
   const {
-    student_id, course_id, instructor_id,
-    category_id, rating, comments, is_anonymous = true,
-    semester, academic_year, student_name
+    student_id,
+    course_id,
+    module_id,
+    category_id,
+    rating,
+    comments,
+    is_anonymous = true,
+    semester,
+    academic_year,
+    student_name
   } = data;
 
   const query = `
     INSERT INTO feedback (
-      student_id, course_id, instructor_id,
-      category_id, rating, comments, is_anonymous,
-      semester, academic_year, student_name
+      student_id,
+      course_id,
+      module_id,
+      category_id,
+      rating,
+      comments,
+      is_anonymous,
+      semester,
+      academic_year,
+      student_name
     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
     RETURNING *
   `;
 
   const values = [
-    student_id, course_id, instructor_id,
-    category_id, rating, comments, is_anonymous,
-    semester, academic_year,
+    student_id,
+    course_id,
+    module_id,
+    category_id,
+    rating,
+    comments,
+    is_anonymous,
+    semester,
+    academic_year,
     is_anonymous ? 'Anonymous Student' : student_name
   ];
 

@@ -1,60 +1,45 @@
 const bcrypt = require('bcrypt');
 const db = require('../config/db');
-require('dotenv').config();
 
 // Render login page
 const getLogin = (req, res) => {
-  res.render('auth/login', {
+  res.render('pages/login', {
     message: req.flash('error')[0] || null,
   });
 };
-console.log('ADMIN_EMAIL from env:', process.env.ADMIN_EMAIL);
-console.log('ADMIN_PASSWORD from env:', process.env.ADMIN_PASSWORD);
 
-// Handle login POST (admin & students)
+// Handle login POST
 const postLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Logging input and env values for debugging
-    console.log("Login attempt:", email);
     const adminEmail = process.env.ADMIN_EMAIL;
     const adminPassword = process.env.ADMIN_PASSWORD;
 
-    console.log("Configured Admin Email:", adminEmail);
-    console.log("Configured Admin Password:", adminPassword); // In production, avoid logging passwords
-
-    // Admin login logic
+    // Admin login
     if (email === adminEmail) {
       if (password === adminPassword) {
-        console.log("Admin login successful");
         req.session.user = {
           id: 'admin',
           email: adminEmail,
           name: 'Admin',
-          role: 'admin'
+          role: 'admin',
         };
         req.session.isLoggedIn = true;
         req.flash('success', 'Welcome Admin!');
         return res.redirect('/admin/landing_admin');
       } else {
-        console.log("Admin password mismatch");
         req.flash('error', 'Invalid admin credentials.');
         return res.redirect('/login');
       }
     }
 
-    // Student login logic
-    const student = await db.oneOrNone('SELECT * FROM students WHERE email = $1', [email]);
-    if (!student) {
-      console.log("Student not found");
-      req.flash('error', 'Invalid email or password');
-      return res.redirect('/login');
-    }
+    // Student login
+    const student = await db.oneOrNone(
+      'SELECT * FROM users WHERE LOWER(email) = LOWER($1)',
+      [email]
+    );
 
-    const isMatch = await bcrypt.compare(password, student.password);
-    if (!isMatch) {
-      console.log("Incorrect student password");
+    if (!student || !(await bcrypt.compare(password, student.password))) {
       req.flash('error', 'Invalid email or password');
       return res.redirect('/login');
     }
@@ -62,55 +47,83 @@ const postLogin = async (req, res) => {
     req.session.user = {
       id: student.id,
       email: student.email,
-      name: student.name,
-      role: 'student'
+      name: `${student.first_name} ${student.last_name}`,
+      role: student.role
     };
     req.session.isLoggedIn = true;
     req.flash('success', 'Login successful');
-    console.log("Student login successful");
     res.redirect('/user/home');
 
   } catch (error) {
     console.error('Login error:', error);
-    req.flash('error', 'Something went wrong');
+    req.flash('error', 'Something went wrong during login');
     res.redirect('/login');
   }
 };
 
 // Render register page
 const getRegister = (req, res) => {
-  res.render('auth/register');
+  res.render('pages/register', {
+    formData: {},
+    errors: []
+  });
 };
 
-// Handle registration POST (students only)
+// Handle registration POST
 const postRegister = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { firstName, lastName, email, password, confirmPassword, role } = req.body;
+
   try {
+    if (password !== confirmPassword) {
+      req.flash('error', 'Passwords do not match');
+      return res.render('pages/register', {
+        formData: { firstName, lastName, email },
+        errors: ['Passwords do not match']
+      });
+    }
+
+    const existingUser = await db.oneOrNone(
+      'SELECT * FROM users WHERE LOWER(email) = LOWER($1)',
+      [email]
+    );
+
+    if (existingUser) {
+      req.flash('error', 'Email already registered');
+      return res.render('pages/register', {
+        formData: { firstName, lastName, email },
+        errors: ['Email already in use']
+      });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    await db.none('INSERT INTO students(name, email, password) VALUES($1, $2, $3)', [
-      name, email, hashedPassword
-    ]);
+
+    await db.none(
+      'INSERT INTO users (first_name, last_name, email, password, role) VALUES ($1, $2, $3, $4, $5)',
+      [firstName, lastName, email, hashedPassword, role || 'student']
+    );
+
     req.flash('success', 'Registration successful. Please log in.');
     res.redirect('/login');
+
   } catch (error) {
     console.error('Registration error:', error);
-    req.flash('error', 'Registration failed');
-    res.redirect('/register');
+    req.flash('error', 'Registration failed. Please try again.');
+    res.render('pages/register', {
+      formData: { firstName, lastName, email },
+      errors: ['Registration failed']
+    });
   }
 };
 
-// Render reset password page
 const getResetPassword = (req, res) => {
-  res.render('auth/reset-password');
+  res.render('pages/reset-password');
 };
 
-// Handle password reset (placeholder)
 const postResetPassword = (req, res) => {
   req.flash('info', 'Password reset feature coming soon.');
   res.redirect('/login');
 };
 
-// Logout
 const logout = (req, res) => {
   req.session.destroy(err => {
     if (err) {
