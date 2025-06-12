@@ -8,3 +8,4 @@ const db = pgp({
     rejectUnauthorized: false
   }
 });
+module.exports = db;
