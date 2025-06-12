@@ -1,8 +1,8 @@
-const { 
-  addFeedback, 
-  getFeedbackByStudentId, 
-  deleteFeedback 
-} = require('../Models/feedbackModel');
+// const { 
+//   addFeedback, 
+//   getFeedbackByStudentId, 
+//   deleteFeedback 
+// } = require('../Models/feedbackModel');
 const db = require('../config/db');
 const { ensureAuthenticated } = require('../middleware/authMiddleware');
 
