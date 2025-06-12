@@ -12,6 +12,4 @@ const db = pgp({
   }
 });
 
-module.exports = {
-  db,         
-};
+module.exports = db ;
