@@ -1,3 +1,6 @@
+const pgp = require('pg-promise')();
+require('dotenv').config();
+
 const db = pgp({
   host: process.env.DB_HOST || 'localhost',
   port: process.env.DB_PORT || 5432,
@@ -8,4 +11,7 @@ const db = pgp({
     rejectUnauthorized: false
   }
 });
+
 module.exports = db;
+
+
